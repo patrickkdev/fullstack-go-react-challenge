@@ -1,10 +1,10 @@
 package domain
 
 type Job struct {
-	ID          int
-	Title       string
-	Description string
-	Company     string
-	Location    string
-	Salary      string
+	ID          int    `json:"id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Company     string `json:"company"`
+	Location    string `json:"location"`
+	Salary      string `json:"salary"`
 }

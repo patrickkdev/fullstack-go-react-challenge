@@ -42,7 +42,7 @@ func main() {
 	r := api.NewRouter(authService, userService, jobService, jobAppService)
 
 	server := &http.Server{
-		Addr:    ":8080",
+		Addr:    ":4000",
 		Handler: r,
 	}
 
@@ -52,7 +52,7 @@ func main() {
 		}
 	}()
 
-	log.Println("server started on :8080")
+	log.Println("server started on :4000")
 
 	<-ctx.Done()
 

@@ -3,6 +3,7 @@ package api
 import (
 	"api/internal/application"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -12,6 +13,13 @@ func NewRouter(authService *application.AuthService, userService *application.Us
 	jobAppController := NewJobApplicationController(appService)
 
 	r := gin.Default()
+
+	corsConfig := cors.DefaultConfig()
+	corsConfig.AllowAllOrigins = true
+	corsConfig.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
+	corsConfig.AllowHeaders = []string{"Origin", "Content-Type", "Authorization"}
+
+	r.Use(cors.New(corsConfig))
 
 	r.POST("/register", authController.Register)
 	r.POST("/login", authController.Login)
