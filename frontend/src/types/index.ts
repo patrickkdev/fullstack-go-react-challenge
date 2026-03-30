@@ -3,6 +3,7 @@ export type AuthUser = {
 	id: number
   name: string
 	email: string
+  sessionToken: string
 }
 
 export type AuthCredentials = {

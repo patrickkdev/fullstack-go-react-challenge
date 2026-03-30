@@ -32,11 +32,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		async function loadSession() {
 			try {
 				const user = await authService.profile()
-				window.localStorage.setItem('authUser', JSON.stringify(user))
 				setUser(user)
 			} catch {
 				window.localStorage.removeItem('authToken')
-				window.localStorage.removeItem('authUser')
 				setUser(null)
 			} finally {
 				setIsLoading(false)
@@ -50,9 +48,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		setIsLoading(true)
 		setError(null)
 		try {
-			const { user, token } = await authService.login(credentials)
-			window.localStorage.setItem('authToken', token)
-			window.localStorage.setItem('authUser', JSON.stringify(user))
+			const { user } = await authService.login(credentials)
+			window.localStorage.setItem('authToken', user.sessionToken)
 			setUser(user)
 		} catch (err: unknown) {
 			const message = err instanceof Error ? err.message : 'Falha ao fazer login'
@@ -67,9 +64,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		setIsLoading(true)
 		setError(null)
 		try {
-			const { user, token } = await authService.register(credentials)
-			window.localStorage.setItem('authToken', token)
-			window.localStorage.setItem('authUser', JSON.stringify(user))
+			const { user } = await authService.register(credentials)
+			window.localStorage.setItem('authToken', user.sessionToken)
 			setUser(user)
 		} catch (err: unknown) {
 			const message = err instanceof Error ? err.message : 'Falha ao cadastrar'
@@ -81,7 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	}
 
 	const logout = () => {
-		window.localStorage.removeItem('authUser')
+		window.localStorage.removeItem('authToken')
 		setUser(null)
 	}
 
