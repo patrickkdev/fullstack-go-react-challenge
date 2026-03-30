@@ -21,7 +21,7 @@ func init() {
 	IsDevelopment = Environment != "production"
 
 	DBConfig = db.ConnectionConfig{
-		DBName: getEnv("DB_NAME", "recruitment"),
+		DBName: getEnv("DB_NAME", "recruiting"),
 		DBHost: getEnv("DB_HOST", "localhost"),
 		DBUser: getEnv("DB_USER", "postgres"),
 		DBPass: getEnv("DB_PASS", "postgres"),
