@@ -22,6 +22,7 @@ api.interceptors.response.use(
 	(error: AxiosError) => {
 		if (error.response?.status === 401) {
 			window.localStorage.removeItem('authToken')
+			window.localStorage.removeItem('authUser')
 		}
 		return Promise.reject(error)
 	},

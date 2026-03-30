@@ -22,16 +22,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	const [error, setError] = useState<string | null>(null)
 
 	useEffect(() => {
+		const token = window.localStorage.getItem('authToken')
+		if (!token) {
+			setIsLoading(false)
+			setUser(null)
+			return
+		}
+
 		async function loadSession() {
 			try {
-				const data = await authService.profile()
-				setUser(data)
+				const user = await authService.profile()
+				window.localStorage.setItem('authUser', JSON.stringify(user))
+				setUser(user)
 			} catch {
+				window.localStorage.removeItem('authToken')
+				window.localStorage.removeItem('authUser')
 				setUser(null)
 			} finally {
 				setIsLoading(false)
 			}
 		}
+
 		loadSession()
 	}, [])
 
@@ -39,9 +50,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		setIsLoading(true)
 		setError(null)
 		try {
-			const data = await authService.login(credentials)
-			window.localStorage.setItem('authToken', data.token)
-			setUser(data.user)
+			const { user, token } = await authService.login(credentials)
+			window.localStorage.setItem('authToken', token)
+			window.localStorage.setItem('authUser', JSON.stringify(user))
+			setUser(user)
 		} catch (err: unknown) {
 			const message = err instanceof Error ? err.message : 'Falha ao fazer login'
 			setError(message)
@@ -55,9 +67,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		setIsLoading(true)
 		setError(null)
 		try {
-			const data = await authService.register(credentials)
-			window.localStorage.setItem('authToken', data.token)
-			setUser(data.user)
+			const { user, token } = await authService.register(credentials)
+			window.localStorage.setItem('authToken', token)
+			window.localStorage.setItem('authUser', JSON.stringify(user))
+			setUser(user)
 		} catch (err: unknown) {
 			const message = err instanceof Error ? err.message : 'Falha ao cadastrar'
 			setError(message)
@@ -68,7 +81,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	}
 
 	const logout = () => {
-		window.localStorage.removeItem('authToken')
+		window.localStorage.removeItem('authUser')
 		setUser(null)
 	}
 

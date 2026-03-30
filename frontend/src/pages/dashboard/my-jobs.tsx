@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react'
+import { useAuth } from '../../contexts/AuthContext'
 import { jobService } from '../../services/jobService'
 import type { Job } from '../../types'
 
 export default function MyJobsPage() {
+	const { user } = useAuth()
 	const [myJobs, setMyJobs] = useState<Job[]>([])
 	const [loading, setLoading] = useState(false)
 	const [error, setError] = useState('')
 
 	const loadMyJobs = async () => {
+		if (!user) return
 		setLoading(true)
 		setError('')
 		try {
@@ -20,7 +23,7 @@ export default function MyJobsPage() {
 		}
 	}
 
-	useEffect(() => { loadMyJobs() }, [])
+	useEffect(() => { loadMyJobs() }, [user])
 
 	return (
 		<>

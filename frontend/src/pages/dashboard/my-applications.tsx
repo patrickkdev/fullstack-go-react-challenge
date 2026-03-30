@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react'
+import { useAuth } from '../../contexts/AuthContext'
 import { jobService } from '../../services/jobService'
 import type { Application } from '../../types'
 
 export default function MyApplicationsPage() {
+	const { user } = useAuth()
 	const [applications, setApplications] = useState<Application[]>([])
 	const [loading, setLoading] = useState(false)
 	const [error, setError] = useState('')
 
 	const loadApplications = async () => {
+		if (!user) return
 		setLoading(true)
 		setError('')
 		try {
@@ -20,7 +23,7 @@ export default function MyApplicationsPage() {
 		}
 	}
 
-	useEffect(() => { loadApplications() }, [])
+	useEffect(() => { loadApplications() }, [user])
 
 	return (
 		<>

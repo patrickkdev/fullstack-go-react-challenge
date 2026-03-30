@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useAuth } from '../../contexts/AuthContext'
 import { jobService } from '../../services/jobService'
 import type { Job } from '../../types'
 
@@ -8,12 +9,19 @@ function JobForm({ onCreated }: { onCreated: () => void }) {
 	const [loading, setLoading] = useState(false)
 	const [error, setError] = useState('')
 
+	const { user } = useAuth()
+
 	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault()
 		setError('')
 
 		if (!title.trim() || !description.trim()) {
 			setError('Título e descrição são obrigatórios.')
+			return
+		}
+
+		if (!user) {
+			setError('Usuário não autenticado.')
 			return
 		}
 
@@ -50,6 +58,7 @@ function JobForm({ onCreated }: { onCreated: () => void }) {
 }
 
 export default function JobsPage() {
+	const { user } = useAuth()
 	const [jobs, setJobs] = useState<Job[]>([])
 	const [search, setSearch] = useState('')
 	const [loading, setLoading] = useState(false)
@@ -78,6 +87,11 @@ export default function JobsPage() {
 	}, [jobs, search])
 
 	const handleApply = async (jobId: number) => {
+		if (!user) {
+			alert('Usuário não autenticado.')
+			return
+		}
+
 		try {
 			await jobService.applyJob(jobId)
 			alert('Candidatado com sucesso!')
