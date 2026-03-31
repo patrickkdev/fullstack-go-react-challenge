@@ -37,7 +37,7 @@ export default function MyApplicationsPage() {
 						<li key={app.id} className="job-card">
 							<h3>{`Vaga #${app.jobId}`}</h3>
 							<p>Status: {app.status}</p>
-							<p>Criado em: {app.createdAt}</p>
+							<p>Criado em: {new Date(app.createdAt).toLocaleString()}</p>
 						</li>
 					))
 				)}

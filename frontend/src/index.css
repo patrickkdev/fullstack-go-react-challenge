@@ -370,6 +370,8 @@ code {
   margin-bottom: 16px;
 }
 
+button,
+a.button,
 .tabs a {
   padding: 8px 14px;
   text-decoration: none;

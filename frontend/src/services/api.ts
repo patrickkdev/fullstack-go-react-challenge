@@ -1,4 +1,4 @@
-import axios, { type AxiosError, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios'
+import axios, { type InternalAxiosRequestConfig } from 'axios'
 
 const baseURL = import.meta.env.VITE_API_URL ?? 'http://localhost:4000'
 
@@ -18,11 +18,15 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 })
 
 api.interceptors.response.use(
-	(response: AxiosResponse) => response,
-	(error: AxiosError) => {
-		if (error.response?.status === 401) {
+	(response) => response,
+	(error) => {
+		const status = error.response?.status
+		const url = error.config?.url || ''
+
+		if (status === 401 && !url.includes('/login') && !url.includes('/register')) {
 			window.localStorage.removeItem('authToken')
 		}
+
 		return Promise.reject(error)
 	},
 )

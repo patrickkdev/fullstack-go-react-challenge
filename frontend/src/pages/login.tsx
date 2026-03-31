@@ -29,10 +29,10 @@ export default function Login() {
 			await login({ email, password })
 			navigate('/dashboard')
 		} catch (err: unknown) {
-			const message = err instanceof Error ? err.message : 'Falha no login.'
+      const message = err instanceof Error ? err.message : 'Falha no login.'
 			setError(message)
 		} finally {
-			setLoading(false)
+      setLoading(false)
 		}
 	}
 
