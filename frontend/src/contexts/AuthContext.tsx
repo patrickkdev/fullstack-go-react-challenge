@@ -45,7 +45,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	}, [])
 
 	const login = async (credentials: AuthCredentials) => {
-		setIsLoading(true)
 		setError(null)
 		try {
 			const { user } = await authService.login(credentials)
@@ -61,7 +60,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	}
 
 	const register = async (credentials: RegisterCredentials) => {
-		setIsLoading(true)
 		setError(null)
 		try {
 			const { user } = await authService.register(credentials)
