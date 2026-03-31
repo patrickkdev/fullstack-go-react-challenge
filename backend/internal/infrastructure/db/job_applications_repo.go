@@ -23,7 +23,7 @@ func (r *JobApplicationRepository) Create(app domain.JobApplication) (domain.Job
 	if err := r.db.Create(&model).Error; err != nil {
 		return domain.JobApplication{}, err
 	}
-	return domain.JobApplication{ID: model.ID, UserID: model.UserID, JobID: model.JobID, Status: model.Status}, nil
+	return domain.JobApplication{ID: model.ID, UserID: model.UserID, JobID: model.JobID, Status: model.Status, CreatedAt: model.CreatedAt}, nil
 }
 
 func (r *JobApplicationRepository) ListByUser(userID int) ([]domain.JobApplication, error) {
@@ -33,7 +33,7 @@ func (r *JobApplicationRepository) ListByUser(userID int) ([]domain.JobApplicati
 	}
 	res := make([]domain.JobApplication, 0, len(models))
 	for _, m := range models {
-		res = append(res, domain.JobApplication{ID: m.ID, UserID: m.UserID, JobID: m.JobID, Status: m.Status})
+		res = append(res, domain.JobApplication{ID: m.ID, UserID: m.UserID, JobID: m.JobID, Status: m.Status, CreatedAt: m.CreatedAt})
 	}
 	return res, nil
 }
