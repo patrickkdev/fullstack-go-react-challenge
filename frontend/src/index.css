@@ -259,6 +259,13 @@ code {
   box-shadow: var(--shadow);
 }
 
+.job-card .job-id {
+  font-size: 0.8em;
+  padding-bottom: 0.5em;
+  color: var(--text);
+  font-style: italic;
+}
+
 .job-card h2 {
   margin: 0 0 8px;
 }

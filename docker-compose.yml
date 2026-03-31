@@ -14,6 +14,11 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - recruiting_network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   backend:
     build:
@@ -30,7 +35,8 @@ services:
     ports:
       - "4000:4000"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     networks:
       - recruiting_network
     volumes:

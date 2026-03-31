@@ -42,6 +42,7 @@ export default function MyJobsPage() {
 				) : (
 					myJobs.map((job) => (
 						<li key={job.id} className="job-card">
+              <p className="job-id">ID: {job.id}</p>
 							<h3>{job.title}</h3>
 							<p>{job.description}</p>
 							<p>Empresa: {job.company ?? '—'}</p>
