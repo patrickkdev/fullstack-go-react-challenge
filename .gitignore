@@ -1,9 +1,7 @@
 # Environment files in any level
 .env
 .env.*
-backend/.env
-backend/.env.*
-!backend/.env.example
+!.env.example
 
 # Frontend
 frontend/logs

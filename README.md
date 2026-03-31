@@ -43,7 +43,7 @@ Este projeto inclui uma configuração Docker Compose para facilitar o desenvolv
 ### Configuração
 1. Copie o arquivo de exemplo de variáveis de ambiente:
    ```bash
-   cp backend/.env.example backend/.env
+   cp .env.example .env
    ```
 
 2. Execute o Docker Compose:
