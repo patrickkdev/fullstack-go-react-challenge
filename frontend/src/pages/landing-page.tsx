@@ -1,14 +1,14 @@
 export default function LandingPage() {
 	return (
 		<main className="landing-page">
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.6rem' }}>
+        <a className="cta-button" href="/login">Entrar</a>
+        <a className="cta-button" href="/register">Registrar</a>
+      </div>
 			<section className="hero">
 				<div className="hero-content">
 					<h1>Recrutamento e Seleção</h1>
 					<p>Backend em Go e Frontend em React + Vite.</p>
-					<div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-						<a className="cta-button" href="/login">Entrar</a>
-						<a className="cta-button" href="/register">Registrar</a>
-					</div>
 				</div>
 			</section>
 

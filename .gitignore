@@ -3,6 +3,7 @@
 .env.*
 backend/.env
 backend/.env.*
+!backend/.env.example
 
 # Frontend
 frontend/logs

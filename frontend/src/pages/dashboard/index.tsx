@@ -8,7 +8,7 @@ export default function DashboardLayout() {
 		<main className="dashboard-page">
 			<header className="dashboard-header">
 				<div>
-					<h1>Bem-vindo, {user?.email}</h1>
+					<h1>Bem-vindo, {user?.name}</h1>
 					<p>Área interna de vagas</p>
 				</div>
 				<button onClick={logout}>Sair</button>

@@ -8,6 +8,7 @@ import { PrivateRoute, PublicRoute } from './components/RouteGuards'
 import { AuthProvider } from './contexts/AuthContext'
 import DashboardLayout from './pages/dashboard/index'
 import JobsPage from './pages/dashboard/jobs'
+import CreateJobPage from './pages/dashboard/create-job'
 import MyApplicationsPage from './pages/dashboard/my-applications'
 import MyJobsPage from './pages/dashboard/my-jobs'
 import LandingPage from './pages/landing-page'
@@ -45,6 +46,7 @@ const router = createBrowserRouter([
 		children: [
 			{ index: true, element: <JobsPage /> },
 			{ path: 'jobs', element: <JobsPage /> },
+			{ path: 'jobs/new', element: <CreateJobPage /> },
 			{ path: 'my-jobs', element: <MyJobsPage /> },
 			{ path: 'my-applications', element: <MyApplicationsPage /> },
 		],
@@ -53,9 +55,9 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')!).render(
 	<StrictMode>
-		<AuthProvider>
-			<RouterProvider router={router} />
-		</AuthProvider>
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
 	</StrictMode>,
 )
 

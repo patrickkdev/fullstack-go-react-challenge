@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { jobService } from '../../services/jobService'
 import type { Application } from '../../types'
@@ -9,7 +9,7 @@ export default function MyApplicationsPage() {
 	const [loading, setLoading] = useState(false)
 	const [error, setError] = useState('')
 
-	const loadApplications = async () => {
+	const loadApplications = useCallback(async () => {
 		if (!user) return
 		setLoading(true)
 		setError('')
@@ -21,9 +21,9 @@ export default function MyApplicationsPage() {
 		} finally {
 			setLoading(false)
 		}
-	}
+	}, [user])
 
-	useEffect(() => { loadApplications() }, [user])
+	useEffect(() => { loadApplications() }, [loadApplications])
 
 	return (
 		<>
@@ -35,9 +35,9 @@ export default function MyApplicationsPage() {
 				) : (
 					applications.map((app) => (
 						<li key={app.id} className="job-card">
-							<h3>{app.job?.title ?? `Vaga #${app.jobId}`}</h3>
+							<h3>{`Vaga #${app.jobId}`}</h3>
 							<p>Status: {app.status}</p>
-							<p>Criado em: {new Date(app.createdAt).toLocaleString()}</p>
+							<p>Criado em: {app.createdAt}</p>
 						</li>
 					))
 				)}

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { jobService } from '../../services/jobService'
 import type { Job } from '../../types'
@@ -27,6 +28,12 @@ export default function MyJobsPage() {
 
 	return (
 		<>
+			<header className="page-header">
+				<h1>Minhas vagas</h1>
+				<div>
+					<Link to="/dashboard/jobs/new" className="button">Criar nova vaga</Link>
+				</div>
+			</header>
 			{loading && <p>Carregando...</p>}
 			{error && <p className="error">{error}</p>}
 			<ul className="job-list">

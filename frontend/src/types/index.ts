@@ -39,5 +39,5 @@ export type Application = {
 	userId: number
 	status: string
 	createdAt: string
-	job?: Job
+	jobTitle?: string
 }

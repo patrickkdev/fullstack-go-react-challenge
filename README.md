@@ -31,3 +31,35 @@ Atualizar a tela não posso perder o login, quando logado não posso entrar na t
 - [Axios](https://github.com/axios/axios)  
 
 ---
+
+## 🐳 Docker Setup
+
+Este projeto inclui uma configuração Docker Compose para facilitar o desenvolvimento local com PostgreSQL.
+
+### Pré-requisitos
+- [Docker](https://www.docker.com/get-started)
+- [Docker Compose](https://docs.docker.com/compose/)
+
+### Configuração
+1. Copie o arquivo de exemplo de variáveis de ambiente:
+   ```bash
+   cp backend/.env.example backend/.env
+   ```
+
+2. Execute o Docker Compose:
+   ```bash
+   docker-compose up --build
+   ```
+
+3. A aplicação estará disponível em:
+   - Frontend: http://localhost:5173
+   - Backend: http://localhost:4000
+   - PostgreSQL: localhost:5432
+
+### Comandos Úteis
+- `docker-compose up -d` - Executar em background
+- `docker-compose down` - Parar e remover containers
+- `docker-compose logs` - Ver logs
+- `docker-compose exec postgres psql -U postgres -d recruiting` - Acessar o banco de dados
+
+---
