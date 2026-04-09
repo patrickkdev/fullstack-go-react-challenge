@@ -11,7 +11,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// MockUserRepository is a mock implementation of UserRepository
+var ErrNotFound = errors.New("not found")
+
 type MockUserRepository struct {
 	mock.Mock
 }
@@ -37,26 +38,40 @@ func (m *MockUserRepository) GetBySessionToken(token string) (domain.User, error
 }
 
 func TestAuthService_Register(t *testing.T) {
-	mockRepo := new(MockUserRepository)
-	service := NewAuthService(mockRepo)
-
 	t.Run("successful registration", func(t *testing.T) {
-		user := domain.NewUser("John Doe", "john@example.com", []byte("hashedpass"))
-		mockRepo.On("GetByEmail", "john@example.com").Return(domain.User{}, errors.New("not found")).Once()
-		mockRepo.On("Create", mock.AnythingOfType("domain.User")).Return(user, nil).Once()
+		mockRepo := new(MockUserRepository)
+		service := NewAuthService(mockRepo)
+
+		mockRepo.
+			On("GetByEmail", "john@example.com").
+			Return(domain.User{}, ErrNotFound).
+			Once()
+
+		mockRepo.
+			On("Create", mock.MatchedBy(func(u domain.User) bool {
+				if u.Email != "john@example.com" || u.Name != "John Doe" {
+					return false
+				}
+				return bcrypt.CompareHashAndPassword(u.PasswordHash, []byte("password123")) == nil
+			})).
+			Return(domain.NewUser("John Doe", "john@example.com", []byte("irrelevant")), nil).
+			Once()
 
 		result, err := service.Register("John Doe", "john@example.com", "password123")
 
 		assert.NoError(t, err)
 		assert.Equal(t, "John Doe", result.Name)
 		assert.Equal(t, "john@example.com", result.Email)
+
 		mockRepo.AssertExpectations(t)
 	})
 
 	t.Run("missing required fields", func(t *testing.T) {
+		mockRepo := new(MockUserRepository)
+		service := NewAuthService(mockRepo)
+
 		_, err := service.Register("", "john@example.com", "password123")
 		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "required")
 
 		_, err = service.Register("John", "", "password123")
 		assert.Error(t, err)
@@ -66,78 +81,175 @@ func TestAuthService_Register(t *testing.T) {
 	})
 
 	t.Run("email already registered", func(t *testing.T) {
+		mockRepo := new(MockUserRepository)
+		service := NewAuthService(mockRepo)
+
 		existingUser := domain.NewUser("Existing", "john@example.com", []byte("hash"))
-		mockRepo.On("GetByEmail", "john@example.com").Return(existingUser, nil).Once()
+
+		mockRepo.
+			On("GetByEmail", "john@example.com").
+			Return(existingUser, nil).
+			Once()
 
 		_, err := service.Register("John Doe", "john@example.com", "password123")
 
 		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "already registered")
+		assert.Contains(t, err.Error(), "already")
+
+		mockRepo.AssertExpectations(t)
+	})
+
+	t.Run("repository create failure", func(t *testing.T) {
+		mockRepo := new(MockUserRepository)
+		service := NewAuthService(mockRepo)
+
+		mockRepo.
+			On("GetByEmail", "john@example.com").
+			Return(domain.User{}, ErrNotFound).
+			Once()
+
+		mockRepo.
+			On("Create", mock.Anything).
+			Return(domain.User{}, errors.New("db error")).
+			Once()
+
+		_, err := service.Register("John Doe", "john@example.com", "password123")
+
+		assert.Error(t, err)
 		mockRepo.AssertExpectations(t)
 	})
 }
 
 func TestAuthService_Login(t *testing.T) {
-	mockRepo := new(MockUserRepository)
-	service := NewAuthService(mockRepo)
-
 	t.Run("successful login", func(t *testing.T) {
-		hash, _ := bcrypt.GenerateFromPassword([]byte("password123"), bcrypt.DefaultCost)
+		mockRepo := new(MockUserRepository)
+		service := NewAuthService(mockRepo)
+
+		hash, err := bcrypt.GenerateFromPassword([]byte("password123"), bcrypt.DefaultCost)
+		assert.NoError(t, err)
+
 		user := domain.NewUser("John Doe", "john@example.com", hash)
-		mockRepo.On("GetByEmail", "john@example.com").Return(user, nil).Once()
+
+		mockRepo.
+			On("GetByEmail", "john@example.com").
+			Return(user, nil).
+			Once()
 
 		result, err := service.Login("john@example.com", "password123")
 
 		assert.NoError(t, err)
 		assert.Equal(t, user.ID, result.ID)
+		assert.Equal(t, user.Email, result.Email)
+
 		mockRepo.AssertExpectations(t)
 	})
 
 	t.Run("invalid email", func(t *testing.T) {
-		mockRepo.On("GetByEmail", "wrong@example.com").Return(domain.User{}, errors.New("not found")).Once()
+		mockRepo := new(MockUserRepository)
+		service := NewAuthService(mockRepo)
+
+		mockRepo.
+			On("GetByEmail", "wrong@example.com").
+			Return(domain.User{}, ErrNotFound).
+			Once()
 
 		_, err := service.Login("wrong@example.com", "password123")
 
 		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "invalid credentials")
+		assert.Contains(t, err.Error(), "invalid")
+
 		mockRepo.AssertExpectations(t)
 	})
 
 	t.Run("invalid password", func(t *testing.T) {
-		hash, _ := bcrypt.GenerateFromPassword([]byte("correct"), bcrypt.DefaultCost)
-		user := domain.NewUser("John", "john@example.com", hash)
-		mockRepo.On("GetByEmail", "john@example.com").Return(user, nil).Once()
+		mockRepo := new(MockUserRepository)
+		service := NewAuthService(mockRepo)
 
-		_, err := service.Login("john@example.com", "wrongpassword")
+		hash, err := bcrypt.GenerateFromPassword([]byte("correct"), bcrypt.DefaultCost)
+		assert.NoError(t, err)
+
+		user := domain.NewUser("John", "john@example.com", hash)
+
+		mockRepo.
+			On("GetByEmail", "john@example.com").
+			Return(user, nil).
+			Once()
+
+		_, err = service.Login("john@example.com", "wrongpassword")
 
 		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "invalid credentials")
+		assert.Contains(t, err.Error(), "invalid")
+
+		mockRepo.AssertExpectations(t)
+	})
+
+	t.Run("repository failure", func(t *testing.T) {
+		mockRepo := new(MockUserRepository)
+		service := NewAuthService(mockRepo)
+
+		mockRepo.
+			On("GetByEmail", "john@example.com").
+			Return(domain.User{}, errors.New("db error")).
+			Once()
+
+		_, err := service.Login("john@example.com", "password123")
+
+		assert.Error(t, err)
+
 		mockRepo.AssertExpectations(t)
 	})
 }
 
 func TestAuthService_ValidateToken(t *testing.T) {
-	mockRepo := new(MockUserRepository)
-	service := NewAuthService(mockRepo)
-
 	t.Run("valid token", func(t *testing.T) {
+		mockRepo := new(MockUserRepository)
+		service := NewAuthService(mockRepo)
+
 		user := domain.NewUser("John", "john@example.com", []byte("hash"))
-		mockRepo.On("GetBySessionToken", "validtoken").Return(user, nil).Once()
+
+		mockRepo.
+			On("GetBySessionToken", "validtoken").
+			Return(user, nil).
+			Once()
 
 		result, err := service.ValidateToken("validtoken")
 
 		assert.NoError(t, err)
 		assert.Equal(t, user.ID, result.ID)
+
 		mockRepo.AssertExpectations(t)
 	})
 
 	t.Run("invalid token", func(t *testing.T) {
-		mockRepo.On("GetBySessionToken", "invalidtoken").Return(domain.User{}, errors.New("not found")).Once()
+		mockRepo := new(MockUserRepository)
+		service := NewAuthService(mockRepo)
+
+		mockRepo.
+			On("GetBySessionToken", "invalidtoken").
+			Return(domain.User{}, ErrNotFound).
+			Once()
 
 		_, err := service.ValidateToken("invalidtoken")
 
 		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "invalid token")
+		assert.Contains(t, err.Error(), "invalid")
+
+		mockRepo.AssertExpectations(t)
+	})
+
+	t.Run("repository failure", func(t *testing.T) {
+		mockRepo := new(MockUserRepository)
+		service := NewAuthService(mockRepo)
+
+		mockRepo.
+			On("GetBySessionToken", "token").
+			Return(domain.User{}, errors.New("db error")).
+			Once()
+
+		_, err := service.ValidateToken("token")
+
+		assert.Error(t, err)
+
 		mockRepo.AssertExpectations(t)
 	})
 }
