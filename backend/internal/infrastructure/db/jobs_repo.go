@@ -21,6 +21,7 @@ func (r *JobRepository) Create(job domain.Job, ownerID int) (domain.Job, error) 
 		Company:     job.Company,
 		Location:    job.Location,
 		OwnerID:     ownerID,
+		Salary:      job.Salary,
 	}
 	if err := r.db.Create(&model).Error; err != nil {
 		return domain.Job{}, err

@@ -6,15 +6,20 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"api/internal/application"
 	"api/internal/domain"
 )
 
-type JobController struct {
-	service *application.JobService
+type JobService interface {
+	ListAll() ([]domain.Job, error)
+	Create(job domain.Job, userID int) (domain.Job, error)
+	ListByOwner(userID int) ([]domain.Job, error)
 }
 
-func NewJobController(service *application.JobService) *JobController {
+type JobController struct {
+	service JobService
+}
+
+func NewJobController(service JobService) *JobController {
 	return &JobController{service: service}
 }
 
