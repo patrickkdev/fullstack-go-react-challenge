@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"api/internal/domain"
-	"api/internal/infrastructure/db"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -27,7 +26,7 @@ func (m *MockUserRepository) GetByEmail(email string) (domain.User, error) {
 	return args.Get(0).(domain.User), args.Error(1)
 }
 
-func (m *MockUserRepository) GetByID(id string) (domain.User, error) {
+func (m *MockUserRepository) GetByID(id int) (domain.User, error) {
 	args := m.Called(id)
 	return args.Get(0).(domain.User), args.Error(1)
 }

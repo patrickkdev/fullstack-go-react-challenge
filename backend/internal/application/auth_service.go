@@ -4,16 +4,22 @@ import (
 	"errors"
 
 	"api/internal/domain"
-	"api/internal/infrastructure/db"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
-type AuthService struct {
-	userRepo *db.UserRepository
+type UserRepository interface {
+	Create(user domain.User) (domain.User, error)
+	GetByEmail(email string) (domain.User, error)
+	GetByID(id int) (domain.User, error)
+	GetBySessionToken(token string) (domain.User, error)
 }
 
-func NewAuthService(userRepo *db.UserRepository) *AuthService {
+type AuthService struct {
+	userRepo UserRepository
+}
+
+func NewAuthService(userRepo UserRepository) *AuthService {
 	return &AuthService{userRepo: userRepo}
 }
 
